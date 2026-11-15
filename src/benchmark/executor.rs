@@ -90,8 +90,14 @@ fn run_command_and_measure_common(
         command.env("HYPERFINE_ITERATION", value);
     }
 
-    let measurement = execute_and_measure(command, collect_hardware_counters)
-        .with_context(|| format!("Failed to run command '{command_name}'"))?;
+    let sample_hardware_counters = collect_hardware_counters
+        && options
+            .metrics
+            .iter()
+            .any(|selection| selection.metric.needs_sampling());
+    let measurement =
+        execute_and_measure(command, collect_hardware_counters, sample_hardware_counters)
+            .with_context(|| format!("Failed to run command '{command_name}'"))?;
 
     if !measurement.exit_status.success() {
         use crate::util::exit_code::extract_exit_code;

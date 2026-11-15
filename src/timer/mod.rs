@@ -4,6 +4,8 @@ mod wall_clock_timer;
 mod linux_counters;
 #[cfg(target_os = "macos")]
 mod macos_counters;
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+mod macos_kperf;
 
 #[cfg(windows)]
 mod windows_timer;
@@ -61,10 +63,22 @@ fn discard(output: ChildStdout) {
 }
 
 /// Execute the given command and return a timing summary
+///
+/// `_sample_hardware_counters` asks for the counters that can only be read by
+/// sampling the process, which disturbs its timing and is therefore kept
+/// separate from the counters that are free to collect.
 pub fn execute_and_measure(
     mut command: Command,
     _collect_hardware_counters: bool,
+    _sample_hardware_counters: bool,
 ) -> Result<Measurement> {
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    if _sample_hardware_counters {
+        if let Some(sampler) = macos_kperf::sampler() {
+            return macos_kperf::execute_and_measure(command, &sampler);
+        }
+    }
+
     #[cfg(target_os = "linux")]
     let counters = _collect_hardware_counters.then(linux_counters::CounterGroup::new);
     #[cfg(not(windows))]

@@ -242,14 +242,30 @@ The following metrics are available:
 - **`cache_misses`**: Cache misses.
 
   - Linux: Same scope as `cpu_cycles`. Cache-event definitions depend on the CPU.
-  - macOS/Windows: Currently not supported.
+  - macOS: Apple Silicon only, and requires root. Counts first-level data and instruction
+    cache misses, which is not comparable to the Linux value. See the note on sampled
+    counters below.
+  - Windows: Currently not supported.
 
 - **`branch_misses`**: Mispredicted branches.
 
   - Linux: Same scope as `cpu_cycles`.
-  - macOS/Windows: Currently not supported.
+  - macOS: Apple Silicon only, and requires root. See the note on sampled counters below.
+  - Windows: Currently not supported.
 
 Note that hardware counters are not available when a shell is enabled (`--shell=..`).
+
+On macOS, `cache_misses` and `branch_misses` are read by sampling the process with kperf
+every millisecond, and only when one of them is selected:
+
+- Run hyperfine with `sudo`. The benchmarked commands then run as root as well.
+- Each thread is counted from its first to its last sample, so values are slightly low,
+  and runs shorter than a few milliseconds report no value.
+- Child processes of the command are not counted.
+- Sampling adds some overhead to the command, so compare wall-clock times from runs
+  without these metrics.
+- Other kernel trace clients such as Instruments, `ktrace`, and `fs_usage` are interrupted
+  while a command runs.
 
 Time measurements support units `ns`, `us`, `ms`, `s`, `min`, and `h`. Memory measurements
 support `B`, `kB`, `MB`, `GB`, `TB`, `KiB`, `MiB`, `GiB`, and `TiB`. Hardware counters

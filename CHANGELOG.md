@@ -1,3 +1,9 @@
+# unreleased
+
+## Features
+
+- Add `cache_misses` and `branch_misses` metrics on Apple Silicon macOS when running as root. See [the metric documentation](README.md#choosing-metrics-and-units) for their limitations.
+
 # v2.0.0
 
 See the breaking changes below when migrating from hyperfine 1.x.

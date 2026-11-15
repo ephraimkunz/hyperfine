@@ -286,6 +286,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "darwin-kperf"
+version = "0.1.1"
+source = "git+https://github.com/ephraimkunz/hash?branch=ekunz-sampling-test#9c1a2adc721139e7486fd1eb5dd220dc0a7fdd87"
+dependencies = [
+ "darwin-kperf-events",
+ "darwin-kperf-sys",
+]
+
+[[package]]
+name = "darwin-kperf-events"
+version = "0.1.1"
+source = "git+https://github.com/ephraimkunz/hash?branch=ekunz-sampling-test#9c1a2adc721139e7486fd1eb5dd220dc0a7fdd87"
+
+[[package]]
+name = "darwin-kperf-sys"
+version = "0.1.1"
+source = "git+https://github.com/ephraimkunz/hash?branch=ekunz-sampling-test#9c1a2adc721139e7486fd1eb5dd220dc0a7fdd87"
+
+[[package]]
 name = "difflib"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -386,6 +405,7 @@ dependencies = [
  "clap_complete",
  "colored",
  "csv",
+ "darwin-kperf",
  "humantime",
  "indicatif",
  "insta",

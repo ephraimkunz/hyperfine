@@ -92,6 +92,13 @@ impl Metric {
         !self.is_time() && self != Self::MemoryPeakResident
     }
 
+    /// Counters that are only collected when selected, because reading them
+    /// disturbs the benchmarked process.
+    pub fn needs_sampling(self) -> bool {
+        cfg!(all(target_os = "macos", target_arch = "aarch64"))
+            && matches!(self, Self::CacheMisses | Self::BranchMisses)
+    }
+
     /// Reject known unsupported configurations before any commands execute.
     /// Availability that depends on permissions or hardware is checked after collection.
     pub fn ensure_available(self, shell: bool) -> Result<()> {
@@ -120,7 +127,9 @@ impl Metric {
                 self.name()
             );
             ensure!(
-                !cfg!(target_os = "macos") || matches!(self, Self::CpuCycles | Self::Instructions),
+                !cfg!(target_os = "macos")
+                    || matches!(self, Self::CpuCycles | Self::Instructions)
+                    || self.needs_sampling(),
                 "Metric '{}' is unavailable on macOS",
                 self.name()
             );
